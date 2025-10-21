@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Chrome Extension Icon Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .icon-preview {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        .icon {
+            text-align: center;
+        }
+        .icon canvas {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .icon label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #666;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .instructions {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Chrome Extension Icon Generator</h1>
+        
+        <div class="instructions">
+            <h3>使用说明：</h3>
+            <ol>
+                <li>点击"生成图标"按钮创建不同尺寸的图标</li>
+                <li>右键点击每个图标，选择"另存为图片"</li>
+                <li>将图标保存到 <code>icons/</code> 文件夹中</li>
+                <li>文件名分别为：icon16.png, icon32.png, icon48.png, icon128.png</li>
+            </ol>
+        </div>
+        
+        <div class="icon-preview">
+            <div class="icon">
+                <canvas id="icon16" width="16" height="16"></canvas>
+                <label>16x16</label>
+            </div>
+            <div class="icon">
+                <canvas id="icon32" width="32" height="32"></canvas>
+                <label>32x32</label>
+            </div>
+            <div class="icon">
+                <canvas id="icon48" width="48" height="48"></canvas>
+                <label>48x48</label>
+            </div>
+            <div class="icon">
+                <canvas id="icon128" width="128" height="128"></canvas>
+                <label>128x128</label>
+            </div>
+        </div>
+        
+        <div style="text-align: center;">
+            <button onclick="generateIcons()">生成图标</button>
+            <button onclick="downloadAll()">下载所有图标</button>
+        </div>
+    </div>
+
+    <script>
+        function drawIcon(canvas, size) {
+            const ctx = canvas.getContext('2d');
+            const centerX = size / 2;
+            const centerY = size / 2;
+            const radius = size * 0.4;
+            
+            // 清空画布
+            ctx.clearRect(0, 0, size, size);
+            
+            // 背景渐变
+            const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+            gradient.addColorStop(0, '#4CAF50');
+            gradient.addColorStop(1, '#2E7D32');
+            
+            // 绘制圆形背景
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // 绘制CSS符号
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${size * 0.3}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('CSS', centerX, centerY);
+            
+            // 添加边框
+            ctx.strokeStyle = '#1B5E20';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
+        
+        function generateIcons() {
+            drawIcon(document.getElementById('icon16'), 16);
+            drawIcon(document.getElementById('icon32'), 32);
+            drawIcon(document.getElementById('icon48'), 48);
+            drawIcon(document.getElementById('icon128'), 128);
+        }
+        
+        function downloadCanvas(canvas, filename) {
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+        
+        function downloadAll() {
+            downloadCanvas(document.getElementById('icon16'), 'icon16.png');
+            setTimeout(() => downloadCanvas(document.getElementById('icon32'), 'icon32.png'), 100);
+            setTimeout(() => downloadCanvas(document.getElementById('icon48'), 'icon48.png'), 200);
+            setTimeout(() => downloadCanvas(document.getElementById('icon128'), 'icon128.png'), 300);
+        }
+        
+        // 页面加载时自动生成图标
+        window.onload = generateIcons;
+    </script>
+</body>
+</html>
