@@ -1,0 +1,43 @@
+/* #main {
+  position: absolute;
+
+  background-color: yellowgreen;
+  width: var(--plasmo-main-sidebar-width);
+  height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  transition: all 0.5s ease;
+}
+
+#main.open {
+  right: calc(var(--plasmo-main-sidebar-width) * -1);
+}
+
+#main.closed {
+  right: 0px;
+}
+
+#main p {
+  padding: 0 24px;
+  font-weight: bold;
+  text-align: center;
+  font-size: 24px;
+  font-family: sans-serif;
+}
+
+.sidebar-toggle {
+  position: fixed;
+  right: 4.7px;
+  bottom: 47px;
+} */
+
+#open-button {
+    position: fixed;
+    z-index: 99999;
+    right: 4px;
+    bottom: 4px;
+}

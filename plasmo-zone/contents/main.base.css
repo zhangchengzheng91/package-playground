@@ -1,0 +1,16 @@
+:root,
+#plasmo-main-sidebar:host {
+  --plasmo-main-sidebar-width: 420px;
+}
+
+body.plasmo-main-sidebar-show,
+body.plasmo-main-sidebar-show * {
+  max-width: calc(100vw - var(--plasmo-main-sidebar-width));
+}
+
+#plasmo-main-sidebar {
+  position: fixed;
+  z-index: 240;
+  top: 0px;
+  right: 0px;
+}
