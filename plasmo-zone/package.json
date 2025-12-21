@@ -1,8 +1,8 @@
 {
-  "name": "plasmo-zone",
-  "displayName": "Plasmo zone",
+  "name": "宜享花开发助手",
+  "displayName": "宜享花开发助手",
   "version": "0.0.1",
-  "description": "A basic Plasmo extension.",
+  "description": "宜享花开发助手",
   "author": "Plasmo Corp. <foss@plasmo.com>",
   "scripts": {
     "dev": "plasmo dev",
@@ -25,8 +25,21 @@
     "typescript": "5.3.3"
   },
   "manifest": {
+    "permissions": [
+      "tabs",
+      "notifications"
+    ],
     "host_permissions": [
       "https://*/*"
-    ]
+    ],
+    "commands": {
+      "toggle-drawer": {
+        "suggested_key": {
+          "default": "Alt+Shift+K",
+          "mac": "Command+Shift+K"
+        },
+        "description": "切换工具箱显示/隐藏"
+      }
+    }
   }
 }

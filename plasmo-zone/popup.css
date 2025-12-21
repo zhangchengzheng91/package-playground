@@ -1,0 +1,55 @@
+/**
+ * Popup 样式
+ * 标准工具栏 popup 样式
+ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 600px;
+  max-width: 600px;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+#plasmo-shadow-container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+#plasmo-shadow-container > div {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Antd Tabs 样式优化 */
+.ant-tabs {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.ant-tabs-content-holder {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+}
+
+.ant-tabs-tabpane {
+  height: 100%;
+  overflow: auto;
+}
+
+/* 防止横向滚动 */
+.ant-tabs-content,
+.ant-tabs-tabpane-active {
+  overflow-x: hidden !important;
+}
+

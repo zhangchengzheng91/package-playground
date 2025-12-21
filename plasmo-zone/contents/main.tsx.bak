@@ -1,0 +1,9 @@
+/**
+ * 已迁移到 popup.tsx
+ * 此文件保留作为备份，可以删除
+ * 
+ * 新的实现：
+ * - popup.tsx: 主 UI 界面
+ * - contents/deploy-handler.ts: 轻量级 content script，处理 Deploy 功能的 DOM 操作
+ */
+
