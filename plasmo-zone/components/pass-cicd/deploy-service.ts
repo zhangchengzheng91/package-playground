@@ -1,20 +1,16 @@
 /**
- * Deploy Handler Content Script
- * 轻量级 content script，专门用于处理 Deploy 功能的 DOM 操作
+ * CodeFlow 列表页部署 DOM 操作（供 content script / 注入 UI 复用）
  */
 
-import type { DeployServiceMessage, DeployServiceResponse } from "~types/messages"
+import type { DeployServiceResponse } from "~types/messages"
 
-// 查找搜索输入框
 function findSearchInput(): HTMLInputElement | null {
   return document.querySelector(
     'input[type="text"][autocomplete="off"][placeholder="搜索"]'
   ) as HTMLInputElement | null
 }
 
-// 查找刷新按钮
 function findRefreshButton(): HTMLButtonElement | null {
-  // 使用 XPath 查找包含"刷新"文本的 button 元素
   const xpath = "//button[contains(., '刷新')]"
   const result = document.evaluate(
     xpath,
@@ -25,7 +21,6 @@ function findRefreshButton(): HTMLButtonElement | null {
   )
   let refreshButton = result.singleNodeValue as HTMLButtonElement | null
 
-  // 如果 XPath 没找到，尝试遍历所有 button 并检查 textContent 或 innerText
   if (!refreshButton) {
     const buttons = document.querySelectorAll("button")
     for (const button of buttons) {
@@ -40,7 +35,6 @@ function findRefreshButton(): HTMLButtonElement | null {
   return refreshButton
 }
 
-// 查找包含指定文本的表格行
 function findTableRow(searchText: string): HTMLElement | null {
   const tables = document.querySelectorAll("table")
   for (const table of tables) {
@@ -55,7 +49,6 @@ function findTableRow(searchText: string): HTMLElement | null {
   return null
 }
 
-// 轮询查找元素，直到找到或超时
 function pollUntilFound(
   findFn: () => HTMLElement | null,
   timeout: number = 5000,
@@ -63,30 +56,30 @@ function pollUntilFound(
 ): Promise<HTMLElement | null> {
   return new Promise((resolve) => {
     const startTime = Date.now()
-    
+
     const check = () => {
       const element = findFn()
       if (element) {
         resolve(element)
         return
       }
-      
+
       if (Date.now() - startTime >= timeout) {
         resolve(null)
         return
       }
-      
+
       setTimeout(check, interval)
     }
-    
+
     check()
   })
 }
 
-// 处理部署服务请求
-async function handleDeployService(serviceName: string): Promise<DeployServiceResponse> {
+export async function handleDeployService(
+  serviceName: string
+): Promise<DeployServiceResponse> {
   try {
-    // 查找搜索输入框
     const searchInput = findSearchInput()
     if (!searchInput) {
       return {
@@ -95,13 +88,11 @@ async function handleDeployService(serviceName: string): Promise<DeployServiceRe
       }
     }
 
-    // 设置搜索值并触发事件
     searchInput.value = serviceName
     const inputEvent = new Event("input", { bubbles: true })
     searchInput.dispatchEvent(inputEvent)
     searchInput.focus()
 
-    // 查找并点击刷新按钮
     const refreshButton = findRefreshButton()
     if (!refreshButton) {
       return {
@@ -112,11 +103,10 @@ async function handleDeployService(serviceName: string): Promise<DeployServiceRe
 
     refreshButton.click()
 
-    // 使用轮询查找目标行
     const targetRow = await pollUntilFound(
       () => findTableRow(serviceName),
-      5000, // 5秒超时
-      200   // 每200ms检查一次
+      5000,
+      200
     )
 
     if (!targetRow) {
@@ -126,10 +116,8 @@ async function handleDeployService(serviceName: string): Promise<DeployServiceRe
       }
     }
 
-    // 高亮目标行
     targetRow.style.backgroundColor = "yellowgreen"
 
-    // 查找并点击部署按钮
     const iconBoxElement = targetRow.querySelector(".el-icon-box") as HTMLElement | null
     if (!iconBoxElement) {
       return {
@@ -153,21 +141,3 @@ async function handleDeployService(serviceName: string): Promise<DeployServiceRe
     }
   }
 }
-
-// 监听来自 popup 的消息
-chrome.runtime.onMessage.addListener(
-  (message: DeployServiceMessage, sender, sendResponse) => {
-    if (message.action === "deployService") {
-      handleDeployService(message.serviceName)
-        .then(sendResponse)
-        .catch((error) => {
-          sendResponse({
-            success: false,
-            error: error instanceof Error ? error.message : "未知错误"
-          })
-        })
-      return true // 保持消息通道开放以支持异步响应
-    }
-  }
-)
-

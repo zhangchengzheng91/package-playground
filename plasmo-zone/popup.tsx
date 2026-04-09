@@ -7,7 +7,7 @@ import { useEffect, useState, useMemo, useCallback } from "react"
 import type { TabsProps } from 'antd'
 import { Tabs } from 'antd'
 
-import Deploy from "./components/deploy"
+
 import ResetStyles from "./components/reset-styles"
 import TabManager from './components/tab-manager'
 
@@ -33,11 +33,7 @@ export default function IndexPopup() {
       label: 'Tab管理',
       children: <TabManager refreshTrigger={refreshKey} />,
     },
-    {
-      key: '1',
-      label: '服务部署',
-      children: <Deploy onClose={handleClose} />,
-    },
+
     {
       key: '2',
       label: '样式复写',
