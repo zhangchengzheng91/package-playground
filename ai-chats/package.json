@@ -1,0 +1,57 @@
+{
+  "name": "ai-chats",
+  "version": "1.0.0",
+  "description": "ai-chats",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "rspack serve",
+    "build": "rspack build",
+    "dist:mac": "pnpm run build && electron-builder --mac --publish never",
+    "typecheck": "tsc --noEmit",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": ">=24.14.1"
+  },
+  "dependencies": {
+    "antd": "^6.3.5",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5"
+  },
+  "devDependencies": {
+    "@rspack/cli": "^2.0.0-rc.2",
+    "@rspack/core": "^2.0.0-rc.2",
+    "@rspack/dev-server": "^2.0.0-rc.2",
+    "@rspack/plugin-react-refresh": "^2.0.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "electron": "^41.2.0",
+    "electron-builder": "^26.8.1",
+    "react-refresh": "^0.18.0",
+    "typescript": "^6.0.2"
+  },
+  "build": {
+    "appId": "com.ai-chats.app",
+    "productName": "ai-chats",
+    "electronDist": "node_modules/electron/dist",
+    "asar": true,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "dist/**/*"
+    ],
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.productivity"
+    }
+  }
+}
