@@ -7,7 +7,8 @@
     "start": "electron .",
     "dev": "rspack serve",
     "build": "rspack build",
-    "dist:mac": "pnpm run build && electron-builder --mac --publish never",
+    "dist:mac": "pnpm run build && electron-builder --mac --publish never -c.directories.output=release/mac",
+    "dist:win": "pnpm run build && electron-builder --win --publish never -c.directories.output=release/win",
     "typecheck": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -37,11 +38,10 @@
   "build": {
     "appId": "com.ai-chats.app",
     "productName": "ai-chats",
-    "electronDist": "node_modules/electron/dist",
-    "asar": true,
-    "directories": {
-      "output": "release"
+    "electronDownload": {
+      "mirror": "https://npmmirror.com/mirrors/electron/"
     },
+    "asar": true,
     "files": [
       "main.js",
       "dist/**/*"
@@ -52,6 +52,9 @@
         "zip"
       ],
       "category": "public.app-category.productivity"
+    },
+    "win": {
+      "signAndEditExecutable": false
     }
   }
 }
