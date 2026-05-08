@@ -13,7 +13,7 @@ type ServiceGroup = {
   children: ServiceLeaf[]
 }
 
-const services: ServiceGroup[] = [
+const stageServices: ServiceGroup[] = [
   {
     key: "H5",
     children: [
@@ -137,8 +137,72 @@ const services: ServiceGroup[] = [
     key: "客服",
     children: [
       {
+        title: "信鹿新客服系统后管-前端",
+        key: "xinlu-fontend"
+      },
+    ]
+  }
+]
+
+const prodServices: ServiceGroup[] = [
+  {
+    key: "H5",
+    children: [
+      {
+        title: "宜信小贷无线端",
+        key: "H5"
+      },
+      {
+        title: "宜信小贷无线端-备用1",
+        key: "H5-1"
+      },
+      {
+        title: "宜信小贷无线端-备用2",
+        key: "H5-2"
+      },
+      {
+        title: "宜信小贷无线端-备用3",
+        key: "H5-3"
+      },
+      {
+        title: "宜信小贷无线端-备用4",
+        key: "H5-4"
+      }
+    ]
+  },
+  {
+    key: "宜享花后管",
+    children: [
+      {
+        title: "宜享花管理系统",
+        key: "BOSS-A"
+      },
+    ]
+  },
+  {
+    key: "璇玑",
+    children: [
+      {
         title: "璇玑平台-前端",
-        key: "信鹿新客服系统后管-前端"
+        key: "xuanji-frontend"
+      },
+    ]
+  },
+  {
+    key: "客服",
+    children: [
+      {
+        title: "信鹿新客服系统后管-前端",
+        key: "xinlu-fontend"
+      },
+    ]
+  },
+  {
+    key: "gitlab-robot",
+    children: [
+      {
+        title: "gitlab-robot",
+        key: "gitlab-robot"
       },
     ]
   }
@@ -169,6 +233,12 @@ function tagColorForKey(key: string): string {
 
 function PassCicdCardInner() {
   const { message } = App.useApp()
+
+  const services =
+    typeof window !== "undefined" &&
+    window.location.origin === "http://paas.creditease.corp"
+      ? prodServices
+      : stageServices
 
   const tabItems = useMemo(
     () =>
@@ -205,7 +275,7 @@ function PassCicdCardInner() {
           </div>
         )
       })),
-    [message]
+    [message, services]
   )
 
   return (

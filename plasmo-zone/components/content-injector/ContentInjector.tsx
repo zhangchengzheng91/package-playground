@@ -5,11 +5,13 @@
 import { useEffect, useMemo, useRef, type ReactNode } from "react"
 import { createRoot, type Root } from "react-dom/client"
 
-import { matchesPagePath } from "./path-utils"
+import { matchesHostname, matchesPagePath } from "./path-utils"
 
 export type ContentInjectorProps = {
   /** 仅在该应用路径下插入；不传则任意页面均尝试插入 */
   pagePath?: string
+  /** 仅在该 hostname 下插入；支持字符串或数组；不传则不做域名限制 */
+  hostname?: string | string[]
   /** 插入到的容器，CSS 选择器；`body` 表示 document.body */
   containerSelector?: string
   /** 插入的 React 内容 */
@@ -77,6 +79,7 @@ function startRoutePoll(onChange: () => void, durationMs: number, intervalMs: nu
 
 export function ContentInjector({
   pagePath,
+  hostname,
   containerSelector = "body",
   children = DEFAULT_CHILDREN
 }: ContentInjectorProps) {
@@ -132,6 +135,10 @@ export function ContentInjector({
 
     function sync(): void {
       if (!document.body) {
+        return
+      }
+      if (!matchesHostname(hostname)) {
+        cleanupInjection()
         return
       }
       if (!matchesPagePath(pagePath)) {
@@ -198,7 +205,7 @@ export function ContentInjector({
       stopPoll()
       cleanupInjection()
     }
-  }, [pagePath, containerSelector, children, placement])
+  }, [pagePath, hostname, containerSelector, children, placement])
 
   return null
 }

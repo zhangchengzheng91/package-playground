@@ -35,7 +35,7 @@ function broadcastToContentScripts(message: ActiveTabChangedMessage): void {
 }
 
 // 处理标签页激活事件
-function handleTabActivated(activeInfo: chrome.tabs.TabActiveInfo): void {
+function handleTabActivated(activeInfo: chrome.tabs.OnActivatedInfo): void {
   chrome.tabs.get(activeInfo.tabId, (tab) => {
     if (!chrome.runtime.lastError && tab) {
       const message: ActiveTabChangedMessage = {
@@ -48,7 +48,7 @@ function handleTabActivated(activeInfo: chrome.tabs.TabActiveInfo): void {
 }
 
 // 处理标签页更新事件
-function handleTabUpdated(tabId: number, changeInfo: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab): void {
+function handleTabUpdated(tabId: number, changeInfo: chrome.tabs.OnUpdatedInfo, tab: chrome.tabs.Tab): void {
   if (changeInfo.status === "complete" && tab.active) {
     const message: ActiveTabChangedMessage = {
       action: "activeTabChanged",

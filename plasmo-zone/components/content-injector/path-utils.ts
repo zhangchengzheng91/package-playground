@@ -24,3 +24,22 @@ export function matchesPagePath(pagePath?: string | null): boolean {
   }
   return getCurrentAppPath() === normalizePath(pagePath)
 }
+
+/**
+ * `hostname` 未传或为空：任意域名均视为匹配；
+ * 传入字符串或字符串数组时，与 `location.hostname` 精确匹配其中之一。
+ */
+export function matchesHostname(
+  hostname?: string | string[] | null
+): boolean {
+  if (hostname == null || hostname === "") {
+    return true
+  }
+  const list = Array.isArray(hostname) ? hostname : [hostname]
+  if (list.length === 0) {
+    return true
+  }
+  const current =
+    typeof window !== "undefined" ? window.location.hostname : ""
+  return list.some((h) => current === h)
+}

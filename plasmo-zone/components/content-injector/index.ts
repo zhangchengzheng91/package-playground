@@ -3,4 +3,9 @@ export {
   type ContentInjectorConfig,
   type ContentInjectorProps
 } from "./ContentInjector"
-export { getCurrentAppPath, matchesPagePath, normalizePath } from "./path-utils"
+export {
+  getCurrentAppPath,
+  matchesHostname,
+  matchesPagePath,
+  normalizePath
+} from "./path-utils"

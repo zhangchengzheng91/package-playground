@@ -12,6 +12,8 @@ import {
   ContentInjector,
   type ContentInjectorConfig
 } from "~components/content-injector"
+import { DoubaoInject } from "~components/doubao-inject"
+import { HunyuanInject } from "~components/hunyuan-inject"
 import { PassCicdCard } from "~components/pass-cicd"
 
 import type { PlasmoCSConfig } from "plasmo"
@@ -19,7 +21,11 @@ import type { PlasmoCSConfig } from "plasmo"
 export const config: PlasmoCSConfig = {
   matches: [
     "http://paastest.creditease.corp/*",
-    "https://paastest.creditease.corp/*"
+    "https://paastest.creditease.corp/*",
+    "http://paas.creditease.corp//*",
+    "http://paas.creditease.corp//*",
+    "https://aistudio.tencent.com/*",
+    "https://www.doubao.com/*"
   ],
   run_at: "document_idle"
 }
@@ -30,6 +36,16 @@ export const elementInjectConfigs: ContentInjectorConfig[] = [
     pagePath: "/cicd/codeFlow/list",
     containerSelector: ".cicd-flow",
     children: <PassCicdCard />
+  },
+  {
+    hostname: "aistudio.tencent.com",
+    containerSelector: "body",
+    children: <HunyuanInject />
+  },
+  {
+    hostname: "www.doubao.com",
+    containerSelector: "body",
+    children: <DoubaoInject />
   }
 ]
 
