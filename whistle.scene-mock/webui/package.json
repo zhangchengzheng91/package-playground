@@ -1,0 +1,52 @@
+{
+  "name": "htdocs-v2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "webpack serve --mode development",
+    "preview": "webpack serve --mode production",
+    "build": "webpack --mode production",
+    "build:watch": "webpack --watch --mode production",
+    "watch": "WEBUI_WRITE_DISK=1 webpack serve --mode development",
+    "typecheck": "tsc --noEmit",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "browserslist": [
+    ">0.5%",
+    "last 2 versions",
+    "not dead",
+    "not IE 11"
+  ],
+  "dependencies": {
+    "antd": "6.4.3",
+    "axios": "1.16.1",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "react-router-dom": "7.15.1"
+  },
+  "devDependencies": {
+    "@babel/core": "7.29.7",
+    "@babel/preset-env": "7.29.7",
+    "@babel/preset-react": "7.29.7",
+    "@babel/preset-typescript": "7.29.7",
+    "@types/react": "19.2.15",
+    "@types/react-dom": "19.2.3",
+    "babel-loader": "10.1.1",
+    "css-loader": "7.1.4",
+    "fork-ts-checker-webpack-plugin": "9.1.0",
+    "html-webpack-plugin": "5.6.7",
+    "less": "4.6.4",
+    "less-loader": "13.0.0",
+    "mini-css-extract-plugin": "2.10.2",
+    "style-loader": "4.0.0",
+    "typescript": "6.0.3",
+    "webpack": "5.107.2",
+    "webpack-cli": "7.0.2",
+    "webpack-dev-server": "5.2.4"
+  }
+}
