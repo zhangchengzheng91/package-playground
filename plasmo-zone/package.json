@@ -1,7 +1,7 @@
 {
   "name": "宜享花开发助手",
   "displayName": "宜享花开发助手",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "宜享花开发助手",
   "author": "Plasmo Corp. <foss@plasmo.com>",
   "scripts": {
@@ -37,10 +37,13 @@
   "manifest": {
     "permissions": [
       "tabs",
-      "notifications"
+      "notifications",
+      "scripting",
+      "sidePanel"
     ],
     "host_permissions": [
-      "https://*/*"
+      "https://*/*",
+      "http://*/*"
     ],
     "commands": {
       "toggle-drawer": {

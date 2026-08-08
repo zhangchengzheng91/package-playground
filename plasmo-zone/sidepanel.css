@@ -1,0 +1,27 @@
+/**
+ * 侧边栏页面基础布局（宽度由浏览器侧栏决定）
+ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+#plasmo-shadow-container {
+  width: 100%;
+  min-height: 100%;
+}
+
+#plasmo-shadow-container > div {
+  width: 100%;
+  min-height: 100%;
+}

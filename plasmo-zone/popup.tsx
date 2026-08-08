@@ -4,66 +4,90 @@
  */
 
 import { useEffect, useState, useMemo, useCallback } from "react"
-import type { TabsProps } from 'antd'
-import { Tabs } from 'antd'
-
+import type { TabsProps } from "antd"
+import { Button, Tabs, Typography } from "antd"
 
 import ResetStyles from "./components/reset-styles"
-import TabManager from './components/tab-manager'
+import TabManager from "./components/tab-manager"
 
 import "./popup.css"
+
+async function openExtensionSidePanel(): Promise<void> {
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+  const windowId = tab?.windowId
+  if (windowId == null) {
+    return
+  }
+  await chrome.sidePanel.open({ windowId })
+}
 
 export default function IndexPopup() {
   const [refreshKey, setRefreshKey] = useState(0)
 
-  // 处理关闭 popup（标准 popup 点击外部会自动关闭）
   const handleClose = useCallback(() => {
     // 标准 popup 会自动关闭，这里可以添加清理逻辑
   }, [])
 
-  // 当 popup 打开时，触发刷新
   useEffect(() => {
     setRefreshKey((prev) => prev + 1)
   }, [])
 
-  // 使用 useMemo 缓存 tabs items，避免每次渲染都重新创建
-  const items: TabsProps['items'] = useMemo(() => [
-    {
-      key: '3',
-      label: 'Tab管理',
-      children: <TabManager refreshTrigger={refreshKey} />,
-    },
+  const items: TabsProps["items"] = useMemo(
+    () => [
+      {
+        key: "3",
+        label: "Tab管理",
+        children: <TabManager refreshTrigger={refreshKey} />
+      },
 
-    {
-      key: '2',
-      label: '样式复写',
-      children: <ResetStyles />,
-    },
-  ], [refreshKey, handleClose])
+      {
+        key: "2",
+        label: "样式复写",
+        children: <ResetStyles />
+      }
+    ],
+    [refreshKey, handleClose]
+  )
 
   const onChange = useCallback((key: string) => {
     console.log("切换到标签页:", key)
   }, [])
 
   return (
-    <div 
-      style={{ 
+    <div
+      style={{
         width: 600,
         maxWidth: 600,
         padding: 16,
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column'
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column"
       }}
     >
-      <Tabs 
-        items={items} 
-        defaultActiveKey="3" 
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: 12,
+          flexShrink: 0,
+          gap: 8,
+          flexWrap: "wrap"
+        }}
+      >
+        <Typography.Text style={{ fontSize: 13, color: "rgba(0,0,0,0.45)" }}>快捷功能</Typography.Text>
+        <Button size="small" type="primary" onClick={() => void openExtensionSidePanel()}>
+          打开侧边栏
+        </Button>
+      </div>
+      <Tabs
+        items={items}
+        defaultActiveKey="3"
         onChange={onChange}
         style={{
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column'
+          height: "100%",
+          display: "flex",
+          flexDirection: "column"
         }}
         tabBarStyle={{
           marginBottom: 0,
