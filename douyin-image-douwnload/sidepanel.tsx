@@ -17,6 +17,8 @@ import {
 } from "antd"
 
 import "./sidepanel.css"
+import type { MessageResponse, QueryPageMediaRequest } from "~types/messages"
+import type { PageMediaResult } from "~utils/query-page-media"
 import { parseRelativeTimeToYmd } from "~utils/relative-time"
 import {
   buildSaveFilename,
@@ -38,6 +40,20 @@ const SITE_PRESETS: SitePreset[] = [
     imageSelector: ".focusPanel",
     titleSelector: ".title",
     timeSelector: ".time"
+  },
+  {
+    key: "douyu",
+    label: "douyu",
+    imageSelector: ".focusPanel",
+    titleSelector: ".title",
+    timeSelector: ".time"
+  },
+  {
+    key: "xiaocao",
+    label: "xiaocao",
+    imageSelector: ".tpc_content.do_not_catch",
+    titleSelector: 'td[valign="top"] h4.f16',
+    timeSelector: "tr.tr1 span[data-timestamp]"
   }
 ]
 
@@ -119,75 +135,6 @@ function isInjectableUrl(url: string | undefined): boolean {
   return true
 }
 
-/** 在页面中分别独立查询图片、标题、时间（需为单函数以便 executeScript 注入） */
-function queryPageMedia(
-  imageSelector: string,
-  titleSelector: string,
-  timeSelector: string
-): { srcs: string[]; titles: string[]; times: string[] } {
-  const srcs: string[] = []
-  const seen = new Set<string>()
-
-  // 多个匹配时，取与视口相交面积最大（最沾满屏幕）的元素
-  const imageCandidates = Array.from(document.querySelectorAll(imageSelector))
-  let imageRoot: Element | null = null
-  let bestVisibleArea = -1
-  const viewportWidth = window.innerWidth || document.documentElement.clientWidth
-  const viewportHeight =
-    window.innerHeight || document.documentElement.clientHeight
-
-  imageCandidates.forEach((el) => {
-    const rect = el.getBoundingClientRect()
-    const visibleWidth = Math.max(
-      0,
-      Math.min(rect.right, viewportWidth) - Math.max(rect.left, 0)
-    )
-    const visibleHeight = Math.max(
-      0,
-      Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0)
-    )
-    const visibleArea = visibleWidth * visibleHeight
-    if (visibleArea > bestVisibleArea) {
-      bestVisibleArea = visibleArea
-      imageRoot = el
-    }
-  })
-
-  if (imageRoot) {
-    const imgs =
-      imageRoot instanceof HTMLImageElement
-        ? [imageRoot]
-        : Array.from(imageRoot.querySelectorAll("img"))
-
-    imgs.forEach((img) => {
-      const src = img.getAttribute("src")?.trim() || img.currentSrc?.trim()
-      if (!src || seen.has(src)) return
-      seen.add(src)
-      srcs.push(src)
-    })
-  }
-
-  const trimmedTitle = titleSelector.trim()
-  const titleNodes = trimmedTitle
-    ? Array.from(document.querySelectorAll(trimmedTitle))
-        .map((el) => (el.textContent || "").replace(/\s+/g, " ").trim())
-        .filter(Boolean)
-    : []
-  // title 若匹配到多个，只取第一个
-  const titles = titleNodes.length > 0 ? [titleNodes[0]] : []
-
-  const trimmedTime = timeSelector.trim()
-  const timeNodes = trimmedTime
-    ? Array.from(document.querySelectorAll(trimmedTime))
-        .map((el) => (el.textContent || "").replace(/\s+/g, " ").trim())
-        .filter(Boolean)
-    : []
-  // time 若匹配到多个，只取第一个
-  const times = timeNodes.length > 0 ? [timeNodes[0]] : []
-
-  return { srcs, titles, times }
-}
-
 export default function SidePanel() {
   const [presetKey, setPresetKey] = useState(DEFAULT_PRESET.key)
   const [imageSelector, setImageSelector] = useState(
@@ -222,21 +169,17 @@ export default function SidePanel() {
     })
   }, [])
 
-  const handleClearSelected = useCallback(() => {
-    if (selectedSrcs.length === 0) {
-      message.warning("请先勾选要清空的图片")
+  const handleClearAll = useCallback(() => {
+    if (images.length === 0) {
+      message.warning("暂无图片可清空")
       return
     }
 
-    const selectedSet = new Set(selectedSrcs)
-    setImages((prev) =>
-      prev
-        .filter((item) => !selectedSet.has(item.src))
-        .map((item, index) => ({ ...item, index }))
-    )
+    const count = images.length
+    setImages([])
     setSelectedSrcs([])
-    message.success(`已清空 ${selectedSet.size} 张图片`)
-  }, [selectedSrcs])
+    message.success(`已清空 ${count} 张图片`)
+  }, [images.length])
 
   const handleRenameGroup = useCallback((group: ImageGroup, nextKey: string) => {
     const trimmed = nextKey.trim()
@@ -318,17 +261,35 @@ export default function SidePanel() {
         return
       }
 
-      const results = await chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        func: queryPageMedia,
-        args: [trimmedImage, titleSelector.trim(), timeSelector.trim()]
-      })
-
-      const pageResult = results?.[0]?.result ?? {
-        srcs: [],
-        titles: [],
-        times: []
+      const request: QueryPageMediaRequest = {
+        action: "QUERY_PAGE_MEDIA",
+        presetKey,
+        imageSelector: trimmedImage,
+        titleSelector: titleSelector.trim(),
+        timeSelector: timeSelector.trim()
       }
+
+      let pageResult: PageMediaResult
+      try {
+        const response = (await chrome.tabs.sendMessage(
+          tab.id,
+          request
+        )) as MessageResponse
+        if (!response?.success || !response.data) {
+          throw new Error(response?.error || "页面未返回数据")
+        }
+        pageResult = response.data
+      } catch (error) {
+        const msg = error instanceof Error ? error.message : String(error)
+        if (
+          msg.includes("Could not establish connection") ||
+          msg.includes("Receiving end does not exist")
+        ) {
+          throw new Error("页面脚本未就绪，请刷新目标页面后重试")
+        }
+        throw error
+      }
+
       const { srcs, titles, times } = pageResult
       const title = titles[0] || ""
       const time = parseRelativeTimeToYmd(times[0] || "")
@@ -359,7 +320,7 @@ export default function SidePanel() {
           )
         )
 
-        return [...keptImages, ...fetchedImages].map((item, index) => ({
+        return [...fetchedImages, ...keptImages].map((item, index) => ({
           ...item,
           index
         }))
@@ -374,7 +335,7 @@ export default function SidePanel() {
     } finally {
       setLoading(false)
     }
-  }, [imageSelector, titleSelector, timeSelector])
+  }, [presetKey, imageSelector, titleSelector, timeSelector])
 
   return (
     <div className="sidepanel-root">
@@ -426,8 +387,8 @@ export default function SidePanel() {
             获取图片
           </Button>
           <Button
-            disabled={selectedSrcs.length === 0}
-            onClick={handleClearSelected}>
+            disabled={images.length === 0}
+            onClick={handleClearAll}>
             清空
           </Button>
           <Button
@@ -437,6 +398,15 @@ export default function SidePanel() {
             保存
           </Button>
         </div>
+      </div>
+
+      <div className="stats-row">
+        <Typography.Text type="secondary">
+          图片组 {groups.length}
+        </Typography.Text>
+        <Typography.Text type="secondary">
+          已选择 {selectedSrcs.length}
+        </Typography.Text>
       </div>
 
       <Spin spinning={loading}>
@@ -478,11 +448,18 @@ export default function SidePanel() {
                       return (
                         <div
                           className="image-card"
-                          key={`${item.index}-${item.src}`}>
+                          key={`${item.index}-${item.src}`}
+                          onClick={() =>
+                            handleToggleImage(
+                              item.src,
+                              !selectedSrcs.includes(item.src)
+                            )
+                          }>
                           <div className="image-card-top">
                             <Checkbox
                               className="image-check"
                               checked={selectedSrcs.includes(item.src)}
+                              onClick={(e) => e.stopPropagation()}
                               onChange={(e) =>
                                 handleToggleImage(item.src, e.target.checked)
                               }

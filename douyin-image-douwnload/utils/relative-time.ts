@@ -55,6 +55,11 @@ export function parseRelativeTimeToYmd(
   const text = raw.replace(/\s+/g, "").trim()
   if (!text) return ""
 
+  // data-timestamp 秒级时间戳 * 1000 后的毫秒数
+  if (/^\d{12,13}$/.test(text)) {
+    return formatYmd(new Date(Number(text)))
+  }
+
   const date = new Date(now.getTime())
 
   // 优先：x天前 / x小时前 ...（允许前后有其它文案，如「5天前·湖南」）

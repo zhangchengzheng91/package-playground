@@ -46,6 +46,12 @@ body {
   gap: 8px;
 }
 
+.stats-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
 .action-row > .ant-btn {
   flex: 1;
 }
@@ -73,6 +79,7 @@ body {
   border-radius: 6px;
   padding: 6px;
   background: #fafafa;
+  cursor: pointer;
 }
 
 .image-card-top {
