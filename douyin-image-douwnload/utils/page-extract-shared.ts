@@ -1,5 +1,11 @@
 /** 页面 DOM 提取共用工具（在 content script / 页面上下文中运行） */
 
+/** 站点文件导出该函数表示提供视频匹配；导出 null 则侧边栏按钮置灰 */
+export type VideoMatcher = (
+  rootSelector: string,
+  sourceIndex?: number
+) => string[]
+
 export function getVisibleArea(el: Element): number {
   const viewportWidth = window.innerWidth || document.documentElement.clientWidth
   const viewportHeight =

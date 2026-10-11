@@ -11,22 +11,32 @@ export function sanitizeFilenameSegment(name: string): string {
 }
 
 const IMAGE_EXT_RE = /\.(jpg|jpeg|png|gif|webp|bmp|svg|avif|ico)(?:\?|$|\/)/i
+const VIDEO_EXT_RE = /\.(mp4|webm|mov|m4v|mkv|ogv)(?:\?|#|$|\/)/i
+
+const MEDIA_MIME_EXT: Record<string, string> = {
+  "image/jpeg": ".jpg",
+  "image/jpg": ".jpg",
+  "image/png": ".png",
+  "image/gif": ".gif",
+  "image/webp": ".webp",
+  "image/bmp": ".bmp",
+  "image/svg+xml": ".svg",
+  "image/avif": ".avif",
+  "video/mp4": ".mp4",
+  "video/webm": ".webm",
+  "video/quicktime": ".mov",
+  "video/ogg": ".ogv",
+  "video/x-matroska": ".mkv"
+}
 
 export function guessImageExtension(url: string, contentType?: string | null): string {
   if (contentType) {
     const mime = contentType.split(";")[0].trim().toLowerCase()
-    const map: Record<string, string> = {
-      "image/jpeg": ".jpg",
-      "image/jpg": ".jpg",
-      "image/png": ".png",
-      "image/gif": ".gif",
-      "image/webp": ".webp",
-      "image/bmp": ".bmp",
-      "image/svg+xml": ".svg",
-      "image/avif": ".avif"
-    }
-    if (map[mime]) return map[mime]
+    if (MEDIA_MIME_EXT[mime]) return MEDIA_MIME_EXT[mime]
   }
+
+  const videoMatched = url.match(VIDEO_EXT_RE)
+  if (videoMatched) return `.${videoMatched[1].toLowerCase()}`
 
   const matched = url.match(IMAGE_EXT_RE)
   if (matched) {
@@ -80,7 +90,7 @@ export async function saveImagesToDirectory(
     const item = items[i]
     const res = await fetch(item.url, { credentials: "omit", mode: "cors" })
     if (!res.ok) {
-      throw new Error(`第 ${i + 1}/${total} 张下载失败：HTTP ${res.status}`)
+      throw new Error(`第 ${i + 1}/${total} 个文件下载失败：HTTP ${res.status}`)
     }
     const blob = await res.blob()
     const filename = item.filename.includes(".")

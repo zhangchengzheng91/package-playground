@@ -1,7 +1,7 @@
 {
-  "name": "douyin-image-download",
+  "name": "图片下载助手",
   "displayName": "Douyin Image Download",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Chrome extension for Douyin image download (Plasmo framework)",
   "author": "",
   "scripts": {
@@ -39,11 +39,24 @@
       "activeTab",
       "tabs",
       "scripting",
-      "sidePanel"
+      "sidePanel",
+      "storage",
+      "webRequest",
+      "declarativeNetRequest",
+      "declarativeNetRequestWithHostAccess"
     ],
     "host_permissions": [
       "https://*/*",
       "http://*/*"
-    ]
+    ],
+    "commands": {
+      "_execute_action": {
+        "suggested_key": {
+          "default": "Ctrl+M",
+          "mac": "Ctrl+M"
+        },
+        "description": "打开侧边栏"
+      }
+    }
   }
 }
